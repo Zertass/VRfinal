@@ -62,7 +62,16 @@ public class Arrow : MonoBehaviour
     {
         if (Physics.Linecast(_lastPosition, tip.position, out RaycastHit hitInfo))
         {
-            if (hitInfo.transform.gameObject.layer !=8)
+            if (hitInfo.transform.gameObject.layer == 9) // Слой "dragon"
+            {
+                Dragon dragon = hitInfo.transform.GetComponentInParent<Dragon>();
+                if (dragon != null)
+                {   
+                    float damage = 10f; // Урон, наносимый дракону (можно настроить)
+                    dragon.TakeDamage(damage);
+                }
+            }
+            else if (hitInfo.transform.gameObject.layer !=8)
             {
                 if (hitInfo.transform.TryGetComponent(out Rigidbody body))
                 {
