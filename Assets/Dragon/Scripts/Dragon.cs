@@ -9,8 +9,11 @@ public class Dragon : MonoBehaviour
 
     public GameObject deathEffectPrefab;
     public AudioClip deathSound;
+    public AudioClip[] hitSounds;
+    public AudioClip[] flapSounds;
     private AudioSource audioSource;
     public HealthBar healthBar;
+    public DragonMovement dragonMovement;
 
     private void Start()
     {
@@ -20,6 +23,11 @@ public class Dragon : MonoBehaviour
         if (healthBar != null)
         {
             healthBar.SetMaxHealth(maxHealth);
+        }
+
+        if (flapSounds.Length > 0)
+        {
+            StartCoroutine(PlayFlapSounds());
         }
     }
 
@@ -32,9 +40,33 @@ public class Dragon : MonoBehaviour
             healthBar.UpdateHealth(currentHealth);
         }
 
+        PlayHitSound();
+
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    private void PlayHitSound()
+    {
+        if (hitSounds.Length > 0 && audioSource != null)
+        {
+            int randomIndex = Random.Range(0, hitSounds.Length); // —лучайный звук
+            audioSource.PlayOneShot(hitSounds[randomIndex]);
+        }
+    }
+
+    private IEnumerator PlayFlapSounds()
+    {
+        while (currentHealth > 0)
+        {
+            yield return new WaitForSeconds(1.666f); // ∆дем 5 секунд
+            if (audioSource != null && flapSounds.Length > 0)
+            {
+                int randomIndex = Random.Range(0, flapSounds.Length); // —лучайный звук
+                audioSource.PlayOneShot(flapSounds[randomIndex]);
+            }
         }
     }
 
@@ -43,6 +75,11 @@ public class Dragon : MonoBehaviour
         if (deathEffectPrefab)
         {
             Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        if (dragonMovement)
+        {
+            dragonMovement.Die();
         }
 
         if (deathSound && audioSource)
